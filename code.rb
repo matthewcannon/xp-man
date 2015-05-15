@@ -2,7 +2,13 @@ class Test
     @total = 0
     @failed = 0
 
-    def self.execute(&block)
+    def self.run_all (tests)
+        tests.each do |test|
+            run_test test
+        end
+    end
+
+    def self.run_test(&block)
         block.call
     end
 
@@ -21,19 +27,6 @@ class Test
     end
 end
 
-x = Test.execute do
-    2
-end
-
-Test.assertEquals 1, x
-Test.assertEquals 1, x
-
-y = Test.execute do
-    1 + 1
-end
-
-Test.assertEquals 2, y
-Test.summary
 
 class Cart
     def self.scan item_code
@@ -46,24 +39,26 @@ class Cart
 end
 
 
-class MyTest
+class ShoppingTests
     # 'scanning one a costs 10'
-    def self.run
-        y = Test.execute do
-            Cart.scan 'a'
-        end
+    def self.test1
+        y = Cart.scan 'a'
         Test.assertEquals 10, y
     end
 
     # 'scanning two a's costs 20'
-    def self.run
-        y = Test.execute do
-            Cart.scan 'a'
-            Cart.scan 'a'
-            Cart.total
-        end
-        Test.assertEquals 20, y
+    def self.test2
+        #arrange
+        #act
+        Cart.scan 'a'
+        Cart.scan 'a'
+        #assert
+        Test.assertEquals 20, Cart.total
     end
 end
 
-MyTest.run
+tests = []
+tests[0] = ShoppingTests.test1
+tests[1] = ShoppingTests.test2
+Test.run_all tests
+Test.summary
